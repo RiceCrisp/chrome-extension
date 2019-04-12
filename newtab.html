@@ -1,0 +1,393 @@
+<html>
+  <head>
+    <title>New Tab</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+      }
+      ::placeholder {
+        color: rgba(0,0,0,0.5);
+      }
+      #app {
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: center;
+        transition: 1s ease-in-out;
+        max-height: 100vh;
+        overflow-y: auto;
+      }
+      #app:after {
+        content: '';
+        display: block;
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background: #222;
+        opacity: 1;
+        transition: 1s ease-in-out;
+      }
+      #app.loaded:after {
+        opacity: 0;
+      }
+      #app.hide-ui .container {
+        opacity: 0;
+        pointer-events: none;
+      }
+      .container {
+        opacity: 1;
+        position: relative;
+        z-index: 2;
+        max-width: 360px;
+        padding: 20px;
+        transition: 0.5s ease-in-out;
+      }
+      .container > *:not(:last-child) {
+        margin-bottom: 20px;
+      }
+      .block {
+        background: rgba(255,255,255,0.75);
+        padding: 40px;
+        border-radius: 5px;
+      }
+      .main {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .greeting {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+      }
+      .date h2 {
+        margin: 0;
+      }
+      .date h3 {
+        margin: 5px 0 10px;
+      }
+      .weather {
+        text-decoration: none;
+      }
+      .weather h2 {
+        margin: 0;
+        display: flex;
+        align-items: center;
+      }
+      .icon-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 25%);
+        width: calc(100% + 30px);
+        margin: 0 -15px;
+      }
+      .icon {
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        margin-top: 10px;
+        justify-self: center;
+        position: relative;
+      }
+      .icon svg {
+        width: 100%;
+        height: 100%;
+        fill: #000;
+      }
+      .icon .hover {
+        opacity: 0;
+        pointer-events: none;
+        position: absolute;
+        top: -15px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 10px;
+        border-radius: 4px;
+        background: #000;
+        padding: 3px 6px;
+        color: #fff;
+        transition: 0.2s ease-in-out;
+      }
+      .icon .hover:after {
+        content: '';
+        display: block;
+        position: absolute;
+        bottom: -5px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 0;
+        border: 5px solid transparent;
+        border-top-color: #000;
+        border-bottom: 0;
+      }
+      .icon:hover .hover {
+        opacity: 1;
+        top: -20px;
+      }
+      .weather {
+        margin: 0 0 10px;
+        display: flex;
+        align-items: center;
+        color: #000;
+      }
+      .weather .visual {
+        width: 20px;
+        height: 20px;
+        margin-left: 10px;
+      }
+      form {
+        margin: 0;
+      }
+      input {
+        border-radius: 5px;
+        padding: 15px;
+        font-size: 18px;
+        color: #000;
+        border: 0;
+        width: 100%;
+      }
+      #thesaurus {
+        padding-top: 20px;
+        padding-bottom: 20px;
+      }
+      .trello h2 {
+        margin: 0 0 20px;
+      }
+      .notifications {
+        display: inline-block;
+        color: #fff;
+        font-size: 11px;
+        font-weight: normal;
+        padding: 0 4px;
+        height: 14px;
+        text-align: center;
+        line-height: 13px;
+        background: #007bff;
+        border-radius: 8px;
+        vertical-align: text-top;
+      }
+      .notifications:empty {
+        display: none;
+      }
+      .trello ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      .trello li+li {
+        margin-top: 5px;
+        padding-top: 5px;
+      }
+      .trello p {
+        margin: 5px 0 0;
+      }
+      .options {
+        position: absolute;
+        z-index: 2;
+        right: 5px;
+        bottom: 5px;
+        display: flex;
+      }
+      .options button {
+        background: none;
+        border: 0;
+        padding: 5px;
+        width: 30px;
+        height: 30px;
+        cursor: pointer;
+        outline: none;
+        opacity: 0.5;
+        transition: 0.2s ease-in-out;
+      }
+      .options button:hover {
+        opacity: 1;
+      }
+      .options svg {
+        fill: #fff;
+      }
+      .lightbox {
+        position: fixed;
+        z-index: 3;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background-color: rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        padding: 20px;
+        opacity: 0;
+        pointer-events: none;
+        transition: 0.5s ease-in-out;
+      }
+      .lightbox.show {
+        opacity: 1;
+        pointer-events: all;
+      }
+      .lightbox > * {
+        max-width: 400px;
+        margin: 0 auto;
+      }
+      .lightbox form {
+        background: #fff;
+        border-radius: 5px;
+        padding: 50px;
+      }
+      .lightbox label {
+        display: inline-block;
+        margin-bottom: 4px;
+      }
+      .lightbox input[type=text] {
+        background: #eee;
+        margin-bottom: 20px;
+      }
+      .buttons-right {
+        margin-top: 20px;
+        display: flex;
+        justify-content: flex-end;
+      }
+      input[type=submit] {
+        background: #007bff;
+        color: #fff;
+        max-width: 100px;
+        text-align: center;
+        padding: 10px;
+        font-size: 14px;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: 0.2s ease-in-out;
+      }
+      input[type=submit]:hover {
+        background: #0069d9;
+      }
+      @keyframes loading {
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+      #refresh-btn[disabled] {
+        opacity: 0.5;
+        cursor: default;
+        animation: loading 1s linear infinite;
+      }
+      @media (max-width: 400px) {
+        .container {
+          max-width: 300px;
+        }
+        .block {
+          padding: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <div class="container">
+        <div class="block main">
+          <div class="greeting">
+            <div class="date">
+              <h2>--</h2>
+              <h3>--</h2>
+            </div>
+            <a href="https://www.google.com/search?q=weather" class="weather">
+              <h2><span class="temp">--</span>&deg;F <svg class="visual" viewBox="0 0 24 24"></svg></h2>
+            </a>
+          </div>
+          <div class="icon-grid">
+            <a class="icon" href="https://mail.google.com">
+              <svg viewBox="0 0 24 24">
+                <path d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6zm-2 0l-8 5-8-5h16zm0 12H4V8l8 5 8-5v10z"/>
+              </svg>
+              <div class="hover">Email</div>
+            </a>
+            <a class="icon" href="https://calendar.google.com">
+              <svg viewBox="0 0 24 24">
+                <path d="M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V10h16v11zm0-13H4V5h16v3z"/>
+              </svg>
+              <div class="hover">Calendar</div>
+            </a>
+            <a class="icon" href="https://drive.google.com">
+              <svg viewBox="0 0 24 24">
+                <path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V6h5.17l2 2H20v10zm-5-5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-4 4h8v-1c0-1.33-2.67-2-4-2s-4 .67-4 2v1z"/>
+              </svg>
+              <div class="hover">Drive</div>
+            </a>
+            <a class="icon" href="https://play.google.com/music/listen?u=1">
+              <svg viewBox="0 0 24 24">
+                <path d="M12 3l.01 10.55c-.59-.34-1.27-.55-2-.55C7.79 13 6 14.79 6 17s1.79 4 4.01 4S14 19.21 14 17V7h4V3h-6zm-1.99 16c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
+              </svg>
+              <div class="hover">Music</div>
+            </a>
+            <a class="icon" href="https://iq.bigtime.net">
+              <svg viewBox="0 0 24 24">
+                <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+              </svg>
+              <div class="hover">BigTime</div>
+            </a>
+            <a class="icon" href="https://trello.com">
+              <svg viewBox="0 0 24 24">
+                <path d="M19 5v4H4V5h15m0 10v4H4v-4h15m1-12H3c-.55 0-1 .45-1 1v6c0 .55.45 1 1 1h17c.55 0 1-.45 1-1V4c0-.55-.45-1-1-1zm0 10H3c-.55 0-1 .45-1 1v6c0 .55.45 1 1 1h17c.55 0 1-.45 1-1v-6c0-.55-.45-1-1-1z"/>
+              </svg>
+              <div class="hover">Trello</div>
+            </a>
+            <a class="icon" href="https://bitbucket.org">
+              <svg viewBox="0 0 24 24">
+                <path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/>
+              </svg>
+              <div class="hover">Bitbucket</div>
+            </a>
+            <a id="bookmarks" class="icon" href="chrome://bookmarks">
+              <svg viewBox="0 0 24 24">
+                <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2zm0 15l-5-2.18L7 18V5h10v13z"/>
+              </svg>
+              <div class="hover">Bookmarks</div>
+            </a>
+          </div>
+        </div>
+        <form class="thesaurus-form">
+          <input id="thesaurus" class="block" type="text" placeholder="Thesaurus" />
+        </form>
+        <div class="block trello">
+          <h2>Trello <span class="notifications"></span></h2>
+          <ul class="notification-list">
+            <li><i>Loading...</i></li>
+          </ul>
+        </div>
+      </div>
+      <div class="options">
+        <button id="hide-ui-btn">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 6.5c3.79 0 7.17 2.13 8.82 5.5-1.65 3.37-5.02 5.5-8.82 5.5S4.83 15.37 3.18 12C4.83 8.63 8.21 6.5 12 6.5m0-2C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zm0 5c1.38 0 2.5 1.12 2.5 2.5s-1.12 2.5-2.5 2.5-2.5-1.12-2.5-2.5 1.12-2.5 2.5-2.5m0-2c-2.48 0-4.5 2.02-4.5 4.5s2.02 4.5 4.5 4.5 4.5-2.02 4.5-4.5-2.02-4.5-4.5-4.5z"/>
+          </svg>
+        </button>
+        <button id="settings-btn">
+          <svg viewBox="0 0 20 20">
+            <path d="M15.95 10.78c.03-.25.05-.51.05-.78s-.02-.53-.06-.78l1.69-1.32c.15-.12.19-.34.1-.51l-1.6-2.77c-.1-.18-.31-.24-.49-.18l-1.99.8c-.42-.32-.86-.58-1.35-.78L12 2.34c-.03-.2-.2-.34-.4-.34H8.4c-.2 0-.36.14-.39.34l-.3 2.12c-.49.2-.94.47-1.35.78l-1.99-.8c-.18-.07-.39 0-.49.18l-1.6 2.77c-.1.18-.06.39.1.51l1.69 1.32c-.04.25-.07.52-.07.78s.02.53.06.78L2.37 12.1c-.15.12-.19.34-.1.51l1.6 2.77c.1.18.31.24.49.18l1.99-.8c.42.32.86.58 1.35.78l.3 2.12c.04.2.2.34.4.34h3.2c.2 0 .37-.14.39-.34l.3-2.12c.49-.2.94-.47 1.35-.78l1.99.8c.18.07.39 0 .49-.18l1.6-2.77c.1-.18.06-.39-.1-.51l-1.67-1.32zM10 13c-1.65 0-3-1.35-3-3s1.35-3 3-3 3 1.35 3 3-1.35 3-3 3z"/>
+          </svg>
+        </button>
+        <button id="refresh-btn">
+          <svg viewBox="0 0 24 24">
+            <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div class="lightbox">
+      <form class="settings-form">
+        <label for="tags">Background Image Tags</label>
+        <input id="tags" type="text" />
+        <div class="buttons-right">
+          <input type="submit" value="Save" />
+        </div>
+      </form>
+    </div>
+  </body>
+  <script src="index.js"></script>
+</html>

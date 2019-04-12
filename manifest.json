@@ -1,0 +1,14 @@
+{
+  "manifest_version": 2,
+  "name": "Blake's New Tab",
+  "description": "A new tab for Blake",
+  "version": "1.0",
+  "permissions": ["storage"],
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "chrome_url_overrides" : {
+    "newtab": "newtab.html"
+  }
+}
