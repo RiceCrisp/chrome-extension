@@ -157,7 +157,7 @@
         padding-top: 20px;
         padding-bottom: 20px;
       }
-      .trello h2 {
+      .trello h2, .news h2 {
         margin: 0 0 20px;
       }
       .notifications {
@@ -176,17 +176,38 @@
       .notifications:empty {
         display: none;
       }
-      .trello ul {
+      .trello ul, .news ul {
         list-style: none;
         padding: 0;
         margin: 0;
       }
-      .trello li+li {
+      .trello li+li, .news li+li {
         margin-top: 5px;
         padding-top: 5px;
       }
-      .trello p {
+      .trello p, .news p {
         margin: 5px 0 0;
+      }
+      .news li {
+      }
+      .news img {
+        width: 100%;
+        height: auto;
+      }
+      .news img[src=null] {
+        display: none;
+      }
+      .news img[src=null] + a:before {
+        content: '';
+        display: block;
+        background: #eee;
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="fill:%23ccc"><path d="M11 15h2v2h-2zm0-8h2v6h-2zm.99-5C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/></svg>');
+        background-size: 100px 100px;
+        background-position: center;
+        background-repeat: no-repeat;
+        width: 100%;
+        height: 120px;
+        margin-bottom: 3px;
       }
       .options {
         position: absolute;
@@ -357,6 +378,12 @@
         <div class="block trello">
           <h2>Trello <span class="notifications"></span></h2>
           <ul class="notification-list">
+            <li><i>Loading...</i></li>
+          </ul>
+        </div>
+        <div class="block news">
+          <h2>News</h2>
+          <ul class="news-list">
             <li><i>Loading...</i></li>
           </ul>
         </div>
